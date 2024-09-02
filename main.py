@@ -1,51 +1,53 @@
 def main():
-	book_path = "books/frankenstein.txt"
-	text = get_book_text(book_path)
-	num_words = get_num_words(text)
-	chars_dict = get_chars_dict(text)
-	format_report(book_path, num_words, chars_dict)
+    book_path = "books/frankenstein.txt"
+    text = get_book_text(book_path)
+    num_words = get_num_words(text)
+    chars_dict = get_chars_dict(text)
+    chars_sorted_list = chars_dict_to_sorted_list(chars_dict)
 
-def get_num_words(text) -> int:
-	count = text.split()
-	return len(count)
+    print(f"--- Begin report of {book_path} ---")
+    print(f"{num_words} words found in the document")
+    print()
 
-def get_chars_dict(text) -> {}:
-	chars = {}
+    for item in chars_sorted_list:
+        if not item["char"].isalpha():
+            continue
+        print(f"The '{item['char']}' character was found {item['num']} times")
 
-	for char in text:
-		lower_char = char.lower()
-		if lower_char in chars:
-			chars[lower_char] += 1
-		else:
-			chars[lower_char] = 1
+    print("--- End report ---")
 
-	return chars
+
+def get_num_words(text):
+    words = text.split()
+    return len(words)
+
+
+def sort_on(d):
+    return d["num"]
+
+
+def chars_dict_to_sorted_list(num_chars_dict):
+    sorted_list = []
+    for ch in num_chars_dict:
+        sorted_list.append({"char": ch, "num": num_chars_dict[ch]})
+    sorted_list.sort(reverse=True, key=sort_on)
+    return sorted_list
+
+
+def get_chars_dict(text):
+    chars = {}
+    for c in text:
+        lowered = c.lower()
+        if lowered in chars:
+            chars[lowered] += 1
+        else:
+            chars[lowered] = 1
+    return chars
+
 
 def get_book_text(path):
     with open(path) as f:
         return f.read()
 
-def sort_on(dict):
-    return dict["num"]
 
-def format_report(path, num_words, chars_dict):
-	char_list = []
-	for char in chars_dict:
-		if char.isalpha():
-			char_list.append({"name": char, "num": chars_dict[char]})
-
-	char_list.sort(reverse=True, key=sort_on)
-
-	report = f"""
---- Begin report of {path} ---
-{num_words} words found in the document
-	"""
-
-	for char in char_list:
-		report = report + f"\n The '{char["name"]}' character was found {char["num"]} times"
-
-	report = report + "\n --- End report ---"
-	print(report)
-
-if __name__ == "__main__":
-    main()
+main()
